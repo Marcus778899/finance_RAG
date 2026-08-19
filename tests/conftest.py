@@ -3,12 +3,12 @@ from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 
 import pytest
-from app.config import Settings
+from alembic import command
+from alembic.config import Config
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from testcontainers.community.postgres import PostgresContainer
 
-from alembic import command
-from alembic.config import Config
+from app.config import Settings
 
 ROOT = Path(__file__).resolve().parents[1]
 

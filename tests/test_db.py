@@ -1,9 +1,10 @@
 import pytest
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
+
 from app.config import Settings
 from app.db import create_engine, create_session_factory, session_scope
 from app.models import EMBEDDING_DIM
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine
 
 
 def test_embedding_dim_matches_settings_default():

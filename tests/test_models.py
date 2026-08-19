@@ -2,9 +2,10 @@ import datetime as dt
 from zoneinfo import ZoneInfo
 
 import pytest
-from app.models import EMBEDDING_DIM, Chunk, ChunkSource, DailyDigest, SlackMessage
 from sqlalchemy import select, text
 from sqlalchemy.exc import DBAPIError, IntegrityError
+
+from app.models import EMBEDDING_DIM, Chunk, ChunkSource, DailyDigest, SlackMessage
 
 TAIPEI = ZoneInfo("Asia/Taipei")
 

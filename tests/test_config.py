@@ -1,8 +1,9 @@
 from zoneinfo import ZoneInfo
 
 import pytest
-from app.config import Settings, get_settings
 from pydantic import ValidationError
+
+from app.config import Settings, get_settings
 
 
 def test_tzinfo_resolves_configured_timezone(make_settings):
