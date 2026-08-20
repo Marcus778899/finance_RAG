@@ -84,6 +84,10 @@ compose 會直接報錯而不是靜默使用弱密碼。後端從這些欄位組
   掉進 `message.content`。三種設定實測：`think: true` 與**省略**都會把思考分到獨立的
   `message.thinking` 欄位、content 乾淨；只有 `think: false` 會污染 content。
   正確做法是省略該旗標並只讀 `message.content`。`/no_think` 後綴同樣壓不掉思考。
+- **qwen3:4b 的回答延遲幾乎全是 thinking**。本機實測（Apple Silicon、模型常駐 GPU）：
+  空問題 27 秒、單日 RAG（約 765 tokens）41 秒、四日 RAG（約 3000 tokens）56 秒才吐出
+  第一個內容字元。thinking 無法關閉，且思考 delta 走 `message.thinking` 欄位，若前端
+  只等 `content` 就會空白將近一分鐘。SSE 必須把 thinking 當成進度事件送出去。
 - **時區**。Slack `ts` 是 UTC epoch，但「昨天」指的是 `Asia/Taipei` 的昨天。日期邊界
   一律經 `settings.tzinfo` 換算後再查詢。
 
