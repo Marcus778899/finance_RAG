@@ -41,6 +41,31 @@ uv sync --all-extras
 uv run uvicorn app.main:create_app --factory --reload --app-dir backend
 ```
 
+## Ingest
+
+```bash
+uv run python -m app.ingest.cli                      # 預設抓昨天
+uv run python -m app.ingest.cli --date 2026-08-19    # 指定某一天
+uv run python -m app.ingest.cli --backfill 30        # 回補近 30 天（不含今天）
+```
+
+預設抓「昨天」而非今天，因為當天的訊息通常還沒進完。每天的流程是
+fetch -> upsert 訊息 -> 切 chunk -> embedding -> 產生當日中文摘要 -> 摘要也切 chunk 並 embedding。
+
+整個流程**冪等**：`UNIQUE (channel_id, slack_ts)` 讓訊息 upsert，chunk 與 digest 則是
+先刪後建，所以同一天重跑任意次數結果都相同，訊息被編輯過也會更新。摘要產生失敗時整筆
+交易回滾，不會留下有訊息但缺摘要的半套資料。
+
+Slack app 需要的 scope：`channels:history`（私有頻道用 `groups:history`）、`users:read`。
+
+### 排程
+
+用 crontab 每天早上跑一次：
+
+```
+0 9 * * * cd /path/to/finance_RAG && /path/to/uv run python -m app.ingest.cli >> ingest.log 2>&1
+```
+
 ## 設定
 
 所有設定集中在 `.env`，範本見 `.env.example`。專案內不存在寫死的帳號密碼：
