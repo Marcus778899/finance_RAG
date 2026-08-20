@@ -54,7 +54,11 @@ compose 會直接報錯而不是靜默使用弱密碼。後端從這些欄位組
   runtime 預設只給 4096。檢索到數日內容輕易超過，超出部分會被無聲丟棄而模型仍產出
   看似合理的答案。所有 generate 呼叫必須顯式帶 `options.num_ctx`（設定值
   `GENERATOR_NUM_CTX`，預設 32768）。
-- **qwen3 的 thinking 輸出**用 API 參數 `think: false` 關閉，不要用 regex 剝 `<think>` 標籤。
+- **不要送 `think: false`**。這個旗標看起來像是關閉 thinking，實際上在 Ollama 0.32 +
+  qwen3:4b 下它只關掉 template 的 thinking 解析，模型照樣思考，於是原始思考文字直接
+  掉進 `message.content`。三種設定實測：`think: true` 與**省略**都會把思考分到獨立的
+  `message.thinking` 欄位、content 乾淨；只有 `think: false` 會污染 content。
+  正確做法是省略該旗標並只讀 `message.content`。`/no_think` 後綴同樣壓不掉思考。
 - **時區**。Slack `ts` 是 UTC epoch，但「昨天」指的是 `Asia/Taipei` 的昨天。日期邊界
   一律經 `settings.tzinfo` 換算後再查詢。
 
