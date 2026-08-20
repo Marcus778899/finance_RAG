@@ -83,8 +83,21 @@ pre-commit run --all-files    # 全部 hook
 ```
 
 核心邏輯（`retrieval/`、`ingest/chunker.py`、`ingest/digest.py`）另有 90% 門檻，
-由 CI 第二道閘門把關。測試不得連 ollama 或 Slack，一律注入 `providers/fake.py`；
-DB 測試以 testcontainers 起真的 `pgvector/pgvector:pg17`。
+由 CI 第二道閘門把關。測試不得連 ollama 或 Slack，一律注入 `providers/fake.py`。
+
+DB 測試以 testcontainers 起真的 `pgvector/pgvector:pg17`，因此**跑測試需要 docker daemon**。
+容器啟動後會先跑一次 `upgrade head -> downgrade base -> upgrade head`，順帶驗證 migration
+的 downgrade 路徑沒有壞掉。
+
+### Migration
+
+```bash
+uv run alembic revision --autogenerate -m "描述"
+uv run alembic upgrade head
+```
+
+`alembic/env.py` 預設從 `Settings` 取 `DATABASE_URL`；測試則透過 `config.attributes["db_url"]`
+指向 testcontainers 的臨時資料庫。
 
 ## License
 
